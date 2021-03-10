@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import edu.self.processor.RequestProcessor
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.FiniteDuration
 
 case class HereMapsRepository(
                                requestProcessor: RequestProcessor
