@@ -14,4 +14,5 @@ object HereMapsBoot {
                   appId: String,
                   queryParams: Map[String, AnyRef]): String =
     baseUrl + "?" + break(appCode, appId, queryParams, "")
+
 }

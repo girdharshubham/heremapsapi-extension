@@ -3,11 +3,14 @@ package edu.self
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.{ConfigFactory, ConfigObject}
+import edu.self.model.Link
 import util.Implicits._
-import scala.concurrent.duration._
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.util.Success
 
 object Main {
 
@@ -25,14 +28,18 @@ object Main {
     implicit val system: ActorSystem = ActorSystem("here-maps")
     implicit val dispatcher: ExecutionContextExecutor = system.dispatcher
 
-    val request = HttpRequest(
-      method = HttpMethods.GET,
-      uri = route
-    )
+    val repos = HereMapsRepository()
 
-    Http()
-      .singleRequest(request)
-      .flatMap(_.entity.toStrict(2 seconds))
-      .map(_.data.utf8String).foreach(println)
+    val request: HttpRequest = repos.requestProcessor.prepareRequests(HttpMethods.GET, route)
+
+    import play.api.libs.json._
+
+    repos
+      .requestProcessor
+      .processRequest(request)
+      .map(entity => Json.parse(entity.data.utf8String))
+      .map(_.toSeq)
+      .foreach(println)
+
   }
 }
