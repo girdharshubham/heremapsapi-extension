@@ -1,7 +1,6 @@
 package edu.self.util
 
 import com.typesafe.config.ConfigObject
-import edu.self.model.Link
 import play.api.libs.json.JsValue
 
 object Implicits {
@@ -22,6 +21,7 @@ object Implicits {
 
     def toSeq: Seq[Link] =
       (((jsValue \ "response" \ "route") (0) \ "leg") (0) \ "link").as[Seq[Link]]
+        .map(link => link.copy(linkId = link.linkId.replaceAll("\\+|\\-", "")))
   }
 
 }
