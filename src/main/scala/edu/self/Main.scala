@@ -1,8 +1,11 @@
 package edu.self
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
 import com.typesafe.config.ConfigFactory
+import edu.self.api.AllApis
+import edu.self.service.AllServices
 import edu.self.util.Implicits._
 
 import scala.concurrent.ExecutionContextExecutor
@@ -23,16 +26,9 @@ object Main {
 
     val route = HereMapsBoot.prepareURL(baseUrl, appCode, appId, queryParams)
     val repos = HereMapsRepository()
-    val request: HttpRequest = repos.requestProcessor.prepareRequests(HttpMethods.GET, route)
 
-    import play.api.libs.json._
-
-    repos
-      .requestProcessor
-      .processRequest(request)
-      .map(entity => Json.parse(entity.data.utf8String))
-      .map(_.toSeq)
-      .foreach(println)
-
+    Http()
+      .newServerAt("0.0.0.0", 9000)
+      .bindFlow(AllApis(AllServices(route)).route)
   }
 }

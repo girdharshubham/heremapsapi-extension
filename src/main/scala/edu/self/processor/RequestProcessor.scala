@@ -10,12 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RequestProcessor()(
   implicit system: ActorSystem,
   ec: ExecutionContext) {
-  def prepareRequests(method: HttpMethod, route: String): HttpRequest =
-    HttpRequest(method = method, uri = route)
 
-  def processRequest(request: HttpRequest): Future[HttpEntity.Strict] = Http()
-    .singleRequest(request)
-    .flatMap(_.entity.toStrict(2 seconds))
 
 }
 
