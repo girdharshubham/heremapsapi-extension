@@ -2,18 +2,22 @@ package edu.self
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
-import com.typesafe.config.{ConfigFactory, ConfigObject}
-import util.Implicits._
-import scala.concurrent.duration._
+import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.LazyLogging
+import edu.self.api.AllApis
+import edu.self.service.AllServices
+import edu.self.util.Implicits._
 
 import scala.concurrent.ExecutionContextExecutor
+import scala.io.StdIn
 
-object Main {
+object Main extends LazyLogging {
 
   def main(args: Array[String]): Unit = {
-    val config = ConfigFactory.load()
+    implicit val system: ActorSystem = ActorSystem("here-maps")
+    implicit val dispatcher: ExecutionContextExecutor = system.dispatcher
 
+    val config = ConfigFactory.load()
     val baseUrl = config.getString("heremaps.api.routing.url")
     val appCode = config.getString("heremaps.app.code")
     val appId = config.getString("heremaps.app.id")
@@ -22,17 +26,16 @@ object Main {
       .map
 
     val route = HereMapsBoot.prepareURL(baseUrl, appCode, appId, queryParams)
-    implicit val system: ActorSystem = ActorSystem("here-maps")
-    implicit val dispatcher: ExecutionContextExecutor = system.dispatcher
 
-    val request = HttpRequest(
-      method = HttpMethods.GET,
-      uri = route
-    )
+    val server = Http()
+      .newServerAt("0.0.0.0", 9000)
+      .bindFlow(AllApis(AllServices(route)).route)
 
-    Http()
-      .singleRequest(request)
-      .flatMap(_.entity.toStrict(2 seconds))
-      .map(_.data.utf8String).foreach(println)
+    logger.info("Server started at 0.0.0.0, press <ENTER> to trigger a shutdown")
+    StdIn.readLine()
+    logger.info(  "Shutdown triggered")
+    server
+      .flatMap(_.unbind())
+      .onComplete(_ => system.terminate())
   }
 }
