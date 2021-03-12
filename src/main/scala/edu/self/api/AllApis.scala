@@ -1,12 +1,10 @@
 package edu.self.api
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directives, Route}
+import edu.self.service.AllServices
 import scalaz.Scalaz._
 import scalaz._
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives._
-import edu.self.service.AllServices
 
 import scala.concurrent.ExecutionContext
 
@@ -18,11 +16,12 @@ trait UnifiedService {
   implicit val routeMonoid: Monoid[Route] = Monoid.instance(_ ~ _, reject)
 
   val unsecured: Route = List[Route](
-      new RoutingApi(allServices.routing).route
+    new RoutingApi(allServices.routing).route
   ).concatenate
 
   def api(unsecured: Route): Route = unsecured
-  val route = {
+
+  val route: Route = {
     pathSingleSlash {
       Directives.get {
         complete("Hi! This is the heremaps-api extension")
