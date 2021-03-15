@@ -12,11 +12,10 @@ case class HereMapsRepositories(
                                  mapsRepository: HereMapsRepository,
                                )
 
-
 object HereMapsRepositories {
   def apply(config: Config)(
-           implicit system: ActorSystem,
-           ec: ExecutionContext
+    implicit system: ActorSystem,
+    ec: ExecutionContext
   ): HereMapsRepositories = {
     val baseUrl = config.getString("heremaps.api.routing.url")
     val appCode = config.getString("heremaps.app.code")
