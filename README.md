@@ -1,1 +1,1 @@
-# heremapsapi-speed-alerts
+# heremapsapi-extension
