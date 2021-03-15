@@ -21,15 +21,25 @@ lazy val spray = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion
 lazy val logback = "ch.qos.logback" % "logback-classic" % LogbackVersion
 lazy val typesafeLogging = "com.typesafe.scala-logging" %% "scala-logging" % TypesafeLoggingVersion
 
+lazy val common = (project in file("common"))
+  .settings(
+    libraryDependencies ++= Seq(
+      playJson
+    )
+  )
 
-libraryDependencies ++= Seq(
-  typesafeConfig,
-  akkaActor,
-  akkaStream,
-  akkaHttp,
-  playJson,
-  scalaz,
-  spray,
-  logback,
-  typesafeLogging
-)
+lazy val impl = (project in file("impl"))
+  .settings(
+    libraryDependencies ++= Seq(
+      typesafeConfig,
+      akkaActor,
+      akkaStream,
+      akkaHttp,
+      playJson,
+      scalaz,
+      spray,
+      logback,
+      typesafeLogging
+    )
+  )
+  .dependsOn(common)

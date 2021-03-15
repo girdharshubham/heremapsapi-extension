@@ -2,7 +2,7 @@ package edu.self.api
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import edu.self.service.RoutingService.RouteRequest
+import edu.self.model.RouteRequest
 import edu.self.service.{Marshallers, RoutingService}
 
 class RoutingApi(routingService: RoutingService) extends Marshallers {

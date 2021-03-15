@@ -1,9 +1,9 @@
 package edu.self.service
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import edu.self.model.Link
-import edu.self.service.RoutingService.{Coordinate, RouteRequest}
 import spray.json.{DefaultJsonProtocol, JsObject, JsValue, RootJsonFormat}
+import edu.self.model
+import edu.self.model.{Coordinate, Link, RouteRequest}
 
 trait Marshallers extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val coordinateRequestFormat: RootJsonFormat[Coordinate] = jsonFormat2(Coordinate)
