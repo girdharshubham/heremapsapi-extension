@@ -8,7 +8,7 @@ import scalaz._
 
 import scala.concurrent.ExecutionContext
 
-case class AllApis(allServices: AllServices)(implicit ec: ExecutionContext) extends UnifiedService
+case class AllApis(allServices: AllServices) extends UnifiedService
 
 trait UnifiedService {
   def allServices: AllServices
