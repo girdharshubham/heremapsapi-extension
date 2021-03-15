@@ -1,7 +1,6 @@
 package edu.self.model
 
-import play.api.libs.json.{Format, Json, OFormat}
-import spray.json.DefaultJsonProtocol._
+import play.api.libs.json.{Format, Json}
 
 case class Link(linkId: String, shape: List[String], speedLimit: Double)
 
