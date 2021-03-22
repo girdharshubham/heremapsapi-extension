@@ -3,18 +3,22 @@ package edu.self.reposistory
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
+import com.mongodb.BasicDBObject
 import edu.self.model.{Coordinate, Link}
 import edu.self.repository.MapsRepository
 import edu.self.util.Implicits._
+import org.mongodb.scala.MongoDatabase
 import play.api.libs.json.Json
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class HereMapsRepository(route: String)(
+class HereMapsRepository(route: String, database: MongoDatabase)(
   implicit system: ActorSystem,
   ec: ExecutionContext
 ) extends MapsRepository {
+  private val collection = database.getCollection("links")
+
   def getLinks(start: Coordinate, end: Coordinate): Future[Seq[Link]] = {
     val request = HttpRequest(
       method = HttpMethods.GET,

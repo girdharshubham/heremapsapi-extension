@@ -2,7 +2,7 @@ package edu.self
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import edu.self.api.AllApis
 import edu.self.service.AllServices
@@ -15,9 +15,9 @@ object Main extends LazyLogging {
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem = ActorSystem("here-maps")
     implicit val dispatcher: ExecutionContextExecutor = system.dispatcher
-    val config = ConfigFactory.load()
+    val config: Config = ConfigFactory.load()
 
-    val repos = HereMapsRepositories(config)
+    val repos: HereMapsRepositories = HereMapsRepositories(config)
 
     val server = Http()
       .newServerAt("0.0.0.0", 9000)

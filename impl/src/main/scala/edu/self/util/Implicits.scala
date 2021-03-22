@@ -1,6 +1,7 @@
 package edu.self.util
 
 import com.typesafe.config.ConfigObject
+import edu.self.config.MongoConfig
 import play.api.libs.json.JsValue
 
 object Implicits {

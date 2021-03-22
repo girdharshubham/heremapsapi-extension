@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  mongodb:
+    image: mongo:4
+    container_name: mongo
+    environment:
+      - MONGOINITDB_ROOT_USERNAME=${MONGODB_USERNAME:-root}
+      - MONGOINITDB_ROOT_USERNAME=${MONGODB_PASSWORD:-changeme}
+    ports:
+      - 27017:27017

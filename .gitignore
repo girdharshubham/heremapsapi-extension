@@ -5,3 +5,8 @@ target
 .bsp
 project/target
 *.iml
+
+.bloop
+.metals
+.vscode
+metals.sbt
