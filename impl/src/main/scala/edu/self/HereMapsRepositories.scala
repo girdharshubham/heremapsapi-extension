@@ -32,12 +32,11 @@ object HereMapsRepositories {
       proto = config.getString("heremaps.mongodb.proto"),
       username = config.getString("heremaps.mongodb.username"),
       password = config.getString("heremaps.mongodb.password"),
-      address = config.getString("heremaps.mongodb.address"),
-      database = config.getString("heremaps.mongodb.database")
+      address = config.getString("heremaps.mongodb.address")
     )
 
     val mongodbDatabase = MongoClient(mongoDbConfig.toString)
-      .getDatabase(mongoDbConfig.database)
+      .getDatabase(config.getString("heremaps.mongodb.address"))
 
     new HereMapsRepositories(route, new HereMapsRepository(route, mongodbDatabase))
   }

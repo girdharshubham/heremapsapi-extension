@@ -10,7 +10,8 @@ scalaVersion := "2.12.13"
 lazy val common = (project in file("common"))
   .settings(
     libraryDependencies ++= Seq(
-      playJson
+      playJson,
+      mongoDbDriver
     )
   )
 
@@ -26,7 +27,7 @@ lazy val impl = (project in file("impl"))
       spray,
       logback,
       typesafeLogging,
-      mongoDbDriver
+      mongoDbDriver % "provided"
     )
   )
   .dependsOn(common)

@@ -7,11 +7,12 @@ import edu.self.model.{Coordinate, Link, RouteRequest}
 
 trait Marshallers extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val coordinateRequestFormat: RootJsonFormat[Coordinate] = jsonFormat2(Coordinate)
-  implicit val routeRequestFormat: RootJsonFormat[RouteRequest] = jsonFormat2(RouteRequest)
+  implicit val routeRequestFormat: RootJsonFormat[RouteRequest] = jsonFormat1(RouteRequest)
   implicit val linkFormat: RootJsonFormat[Link] = new RootJsonFormat[Link] {
     val base = jsonFormat(
-      (linkId: String, shape: List[String], speedLimit: Double) =>
-        Link(linkId, shape, speedLimit), "linkId", "shape", "speedLimit"
+      (linkId: String, shape: List[String], speedLimit: Double, coordinate: Option[List[Double]]) =>
+        Link(linkId, shape, speedLimit, coordinate),
+      "linkId", "shape", "speedLimit", "coordinate"
     )
 
     override def read(json: JsValue): Link = base.read(json)

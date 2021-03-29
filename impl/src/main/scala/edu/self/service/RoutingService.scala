@@ -7,7 +7,7 @@ import scala.concurrent.Future
 
 class RoutingService(mapsRepository: MapsRepository) {
   def getLinks(routeRequest: RouteRequest): Future[Seq[Link]] = mapsRepository
-    .getLinks(routeRequest.start, routeRequest.end)
+    .getLinks(routeRequest.start, routeRequest.start)
 }
 
 object RoutingService {

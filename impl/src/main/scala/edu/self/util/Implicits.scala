@@ -1,7 +1,7 @@
 package edu.self.util
 
 import com.typesafe.config.ConfigObject
-import edu.self.config.MongoConfig
+import edu.self.model.Coordinate
 import play.api.libs.json.JsValue
 
 object Implicits {
@@ -20,9 +20,15 @@ object Implicits {
 
     import edu.self.model.Link
 
-    def toSeq: Seq[Link] =
+    def toSeq(coordinate: Coordinate): Seq[Link] =
       (((jsValue \ "response" \ "route") (0) \ "leg") (0) \ "link").as[Seq[Link]]
-        .map(link => link.copy(linkId = link.linkId.replaceAll("\\+|\\-", "")))
+        .map { link =>
+          println(s"${coordinate}==========================")
+          link
+            .copy(
+              linkId = link.linkId.replaceAll("\\+|\\-", ""),
+              coordinate = Some(List(coordinate.latitude, coordinate.longitude)))
+        }
   }
 
 }
