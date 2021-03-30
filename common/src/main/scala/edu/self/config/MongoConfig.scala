@@ -6,8 +6,6 @@ case class MongoConfig(
                         password: String,
                         address: String,
                       ) {
-  override def toString: String = {
-    val r = s"${this.proto}://${this.username}:${this.password}@${address}"
-    r
-  }
+  override def toString: String =
+    s"${this.proto}://${this.username}:${this.password}@${address}"
 }

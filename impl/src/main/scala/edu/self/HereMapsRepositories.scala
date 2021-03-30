@@ -36,7 +36,7 @@ object HereMapsRepositories {
     )
 
     val mongodbDatabase = MongoClient(mongoDbConfig.toString)
-      .getDatabase(config.getString("heremaps.mongodb.address"))
+      .getDatabase(config.getString("heremaps.mongodb.database"))
 
     new HereMapsRepositories(route, new HereMapsRepository(route, mongodbDatabase))
   }
