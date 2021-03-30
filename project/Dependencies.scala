@@ -14,7 +14,6 @@ object Dependencies {
   lazy val akkaActor = "com.typesafe.akka" %% "akka-actor" % AkkaVersion
   lazy val akkaStream = "com.typesafe.akka" %% "akka-stream" % AkkaVersion
   lazy val akkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
-  lazy val playJson = "com.typesafe.play" %% "play-json" % PlayJsonVersion
   lazy val scalaz = "org.scalaz" %% "scalaz-core" % ScalazVersion
   lazy val spray = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion
   lazy val logback = "ch.qos.logback" % "logback-classic" % LogbackVersion

@@ -10,7 +10,6 @@ scalaVersion := "2.12.13"
 lazy val common = (project in file("common"))
   .settings(
     libraryDependencies ++= Seq(
-      playJson,
       mongoDbDriver
     )
   )
@@ -22,7 +21,6 @@ lazy val impl = (project in file("impl"))
       akkaActor,
       akkaStream,
       akkaHttp,
-      playJson,
       scalaz,
       spray,
       logback,
