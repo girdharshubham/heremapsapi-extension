@@ -23,15 +23,15 @@ class HereMapsRepository(route: String, database: MongoDatabase)(
 
   private def getFromDB(start: Coordinate): Future[Seq[Link]] = {
     val query = new BasicDBObject()
-    val loc = new BasicDBObject()
+    val coordinate = new BasicDBObject()
     val near = new BasicDBList()
 
     near.put("0", start.longitude)
     near.put("1", start.latitude)
 
-    loc.put("$near", near)
-    loc.put("$maxDistance", Int.box(0))
-    query.put("location", loc)
+    coordinate.put("$near", near)
+    coordinate.put("$maxDistance", Int.box(0))
+    query.put("coordinate", coordinate)
 
     collection
       .find(query)
@@ -45,10 +45,11 @@ class HereMapsRepository(route: String, database: MongoDatabase)(
       Document(
         s"""
            |{
-           |        "location": [${res.location.fold("")(_.mkString(","))}],
-           |        "shape": []
-           |        "linkId": "${res.linkId}",
-           |        "speedLimit": ${res.speedLimit}
+           |  "_id": "${res.linkId}"
+           |  "coordinate": [${res.location.fold("")(_.mkString(","))}],
+           |  "shape": []
+           |  "linkId": "${res.linkId}",
+           |  "speedLimit": ${res.speedLimit}
            |}""".stripMargin)).toFuture().map(_ => Done.getInstance())
   }
 
