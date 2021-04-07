@@ -4,11 +4,12 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
-import com.mongodb.{BasicDBList, BasicDBObject}
 import edu.self.model.{Coordinate, Link}
 import edu.self.repository.MapsRepository
 import edu.self.util.Implicits._
-import org.mongodb.scala.{Document, MongoDatabase}
+import org.mongodb.scala.model.Filters
+import org.mongodb.scala.model.geojson._
+import org.mongodb.scala.{MongoCollection, MongoDatabase, _}
 import spray.json._
 
 import scala.concurrent.duration._
@@ -19,38 +20,20 @@ class HereMapsRepository(route: String, database: MongoDatabase)(
   ec: ExecutionContext
 ) extends MapsRepository {
 
-  private val collection = database.getCollection("links")
+  private val collection: MongoCollection[Link] = database.getCollection("links")
 
   private def getFromDB(start: Coordinate): Future[Seq[Link]] = {
-    val query = new BasicDBObject()
-    val coordinate = new BasicDBObject()
-    val near = new BasicDBList()
-
-    near.put("0", start.longitude)
-    near.put("1", start.latitude)
-
-    coordinate.put("$near", near)
-    coordinate.put("$maxDistance", Int.box(0))
-    query.put("coordinate", coordinate)
-
+    val point = Point(Position(start.longitude, start.latitude))
     collection
-      .find(query)
+      .find(Filters.near("location", point, Some(0.0), None))
       .toFuture()
-      .map(_
-        .map(_.toLink))
   }
 
-  private def insert(res: Link): Future[Done] = {
-    collection.insertOne(
-      Document(
-        s"""
-           |{
-           |  "_id": "${res.linkId}"
-           |  "coordinate": [${res.location.fold("")(_.mkString(","))}],
-           |  "shape": []
-           |  "linkId": "${res.linkId}",
-           |  "speedLimit": ${res.speedLimit}
-           |}""".stripMargin)).toFuture().map(_ => Done.getInstance())
+  private def insert(link: Link): Future[Done] = {
+    collection
+      .insertOne(link)
+      .toFuture()
+      .map(_ => Done.getInstance())
   }
 
   private def getFromApi(start: Coordinate, end: Coordinate): Future[Seq[Link]] = {
@@ -67,12 +50,8 @@ class HereMapsRepository(route: String, database: MongoDatabase)(
 
   def getLinks(start: Coordinate, end: Coordinate): Future[Seq[Link]] = getFromDB(start).flatMap { links =>
     if (links.isEmpty) {
-      val res = getFromApi(start, end)
-      res.map {
-        _.map { link =>
-          insert(link)
-        }
-      }
+      val res: Future[Seq[Link]] = getFromApi(start, end)
+      res.map(_.map(link => insert(link)))
       res
     } else {
       Future.successful(links)

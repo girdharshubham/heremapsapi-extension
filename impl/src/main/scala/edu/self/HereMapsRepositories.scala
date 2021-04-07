@@ -3,9 +3,13 @@ package edu.self
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import edu.self.config.MongoConfig
+import edu.self.model.{Coordinate, Link}
 import edu.self.reposistory.HereMapsRepository
 import edu.self.util.Implicits._
-import org.mongodb.scala.{MongoClient, MongoDatabase}
+import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
+import org.mongodb.scala.MongoClient
+import org.mongodb.scala.MongoClient.DEFAULT_CODEC_REGISTRY
+import org.mongodb.scala.bson.codecs.Macros._
 
 import scala.concurrent.ExecutionContext
 
@@ -35,8 +39,12 @@ object HereMapsRepositories {
       address = config.getString("heremaps.mongodb.address")
     )
 
+    val codecRegistry =
+      fromRegistries(fromProviders(classOf[Coordinate], classOf[Link]), DEFAULT_CODEC_REGISTRY)
+
     val mongodbDatabase = MongoClient(mongoDbConfig.toString)
       .getDatabase(config.getString("heremaps.mongodb.database"))
+      .withCodecRegistry(codecRegistry)
 
     new HereMapsRepositories(route, new HereMapsRepository(route, mongodbDatabase))
   }
