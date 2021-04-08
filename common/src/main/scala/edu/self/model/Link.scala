@@ -1,8 +1,36 @@
+// Copyright (C) 2021-2022 the original author or authors.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package edu.self.model
 
-case class Link(linkId: String, shape: List[String], speedLimit: Double, location: Option[List[Double]])
+import java.time.ZonedDateTime
+
+case class Link(
+                 linkId: String,
+                 shape: List[String],
+                 speedLimit: Double,
+                 location: Option[List[Double]],
+                 updatedAt: Option[ZonedDateTime]
+               )
 
 object Link {
-  def apply(linkId: String, shape: List[String], speedLimit: Double, location: Option[List[Double]] = None): Link =
-    new Link(linkId = linkId, shape = shape, speedLimit = speedLimit, location = location)
+  def apply(
+             linkId: String,
+             shape: List[String],
+             speedLimit: Double,
+             location: Option[List[Double]] = None,
+             updatedAt: Option[ZonedDateTime]): Link =
+    new Link(linkId, shape = shape, speedLimit = speedLimit, location = location, updatedAt)
 }

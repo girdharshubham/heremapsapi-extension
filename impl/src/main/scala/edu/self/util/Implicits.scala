@@ -1,4 +1,4 @@
-// Copyright (C) 2011-2012 the original author or authors.
+// Copyright (C) 2021-2022 the original author or authors.
 // See the LICENCE.txt file distributed with this work for additional
 // information regarding copyright ownership.
 //
@@ -20,6 +20,8 @@ import edu.self.model.{Coordinate, Link}
 import edu.self.service.Marshallers
 import org.mongodb.scala.Document
 import spray.json._
+
+import java.time.ZonedDateTime
 
 object Implicits {
 
@@ -58,12 +60,14 @@ object Implicits {
         .asJsObject()
         .fields
 
-      leg("link").convertTo[Seq[Link]]
+      leg("link")
+        .convertTo[Seq[Link]]
         .map { link =>
           link.copy(
             linkId = link.linkId.replaceAll("\\+|\\-", ""),
-            location = Some(List(coordinate.longitude, coordinate.latitude
-            )))
+            location = Some(List(coordinate.longitude, coordinate.latitude)),
+            updatedAt = Some(ZonedDateTime.now())
+          )
         }
     }
   }

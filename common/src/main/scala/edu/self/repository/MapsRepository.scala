@@ -1,4 +1,4 @@
-// Copyright (C) 2011-2012 the original author or authors.
+// Copyright (C) 2021-2022 the original author or authors.
 // See the LICENCE.txt file distributed with this work for additional
 // information regarding copyright ownership.
 //
@@ -24,8 +24,9 @@ import scala.concurrent.Future
 trait MapsRepository {
 
   protected val collection: MongoCollection[Link]
+  val timeToLive: Int
 
-  def cache(link: Link): Future[Done]
-
+  def insert(link: Link): Future[Done]
+  def update(link: Link): Future[Done]
   def getLinks(start: Coordinate, end: Coordinate): Future[Seq[Link]]
 }

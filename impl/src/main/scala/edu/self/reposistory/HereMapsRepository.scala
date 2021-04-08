@@ -1,4 +1,4 @@
-// Copyright (C) 2011-2012 the original author or authors.
+// Copyright (C) 2021-2022 the original author or authors.
 // See the LICENCE.txt file distributed with this work for additional
 // information regarding copyright ownership.
 //
@@ -19,6 +19,7 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
+import com.typesafe.scalalogging.LazyLogging
 import edu.self.model.{Coordinate, Link}
 import edu.self.repository.MapsRepository
 import edu.self.util.Implicits._
@@ -27,21 +28,46 @@ import org.mongodb.scala.model.geojson._
 import org.mongodb.scala.{MongoCollection, MongoDatabase, _}
 import spray.json._
 
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class HereMapsRepository(route: String, database: MongoDatabase)(
+class HereMapsRepository(route: String, database: MongoDatabase, override val timeToLive: Int)(
   implicit system: ActorSystem,
   ec: ExecutionContext
-) extends MapsRepository {
+) extends MapsRepository with LazyLogging {
 
   override val collection: MongoCollection[Link] = database.getCollection("links")
 
-  override def cache(link: Link): Future[Done] = {
+  override def insert(link: Link): Future[Done] = {
     collection
       .insertOne(link)
       .toFuture()
       .map(_ => Done.getInstance())
+  }
+
+  override def update(link: Link): Future[Done] = {
+    collection
+      .replaceOne(Filters.equal("linkId", s"${link.linkId}"), link)
+      .toFuture().map(_ => Done.getInstance())
+  }
+
+  override def getLinks(start: Coordinate, end: Coordinate): Future[Seq[Link]] = getFromDB(start).flatMap {
+    case links if links.isEmpty =>
+      val res = getFromApi(start, end)
+      res.map(_.map(link => insert(link)))
+      res
+    case links if links.nonEmpty =>
+      links.map { link =>
+        if (ChronoUnit.MINUTES.between(link.updatedAt.get, ZonedDateTime.now()) > timeToLive) {
+          logger.info("TTL Expired. Updating")
+          val res = getFromApi(start, end)
+          res.map(_.map(link => update(link)))
+          res
+        }
+      }
+      Future.successful(links)
   }
 
   private def getFromDB(start: Coordinate): Future[Seq[Link]] = {
@@ -61,15 +87,5 @@ class HereMapsRepository(route: String, database: MongoDatabase)(
       .flatMap(_.entity.toStrict(2 seconds))
       .map(entity => entity.data.utf8String.parseJson)
       .map(_.toSeq(start))
-  }
-
-  override def getLinks(start: Coordinate, end: Coordinate): Future[Seq[Link]] = getFromDB(start).flatMap { links =>
-    links match {
-      case list if list.isEmpty =>
-        val res = getFromApi(start, end)
-        res.map(_.map(link => cache(link)))
-        res
-      case list if !list.isEmpty => Future.successful(links)
-    }
   }
 }
