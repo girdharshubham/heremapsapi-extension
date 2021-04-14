@@ -24,7 +24,7 @@ import java.time.{ZoneId, ZonedDateTime}
 
 trait Marshallers extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val coordinateRequestFormat: RootJsonFormat[Coordinate] = jsonFormat2(Coordinate)
-  implicit val routeRequestFormat: RootJsonFormat[RouteRequest] = jsonFormat1(RouteRequest)
+  implicit val routeRequestFormat: RootJsonFormat[RouteRequest] = jsonFormat2(RouteRequest)
   implicit val zonedDateTimeFormat: RootJsonFormat[ZonedDateTime] = new RootJsonFormat[ZonedDateTime] {
 
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault)

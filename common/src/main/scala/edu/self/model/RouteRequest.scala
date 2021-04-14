@@ -15,4 +15,4 @@
 // limitations under the License.
 package edu.self.model
 
-final case class RouteRequest(start: Coordinate)
+final case class RouteRequest(start: Coordinate, end: Coordinate)
