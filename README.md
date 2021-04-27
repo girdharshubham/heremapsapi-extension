@@ -5,7 +5,7 @@
 docker-compose -f docker-compose.yml up -d
 mongo "mongodb://root:changeme@localhost:27017"
 use heremaps
-db.links.createIndex({"coordinate": "2d"})
+db.links.createIndex({"location": "2dsphere"})
 sbt impl/run
 curl --location --request GET 'localhost:9000/route' \
 --header 'Content-Type: application/json' \
